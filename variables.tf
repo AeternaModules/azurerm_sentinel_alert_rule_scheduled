@@ -58,17 +58,17 @@ EOT
     severity                    = string
     techniques                  = optional(set(string))
     tactics                     = optional(set(string))
-    suppression_enabled         = optional(bool, false)
-    suppression_duration        = optional(string, "PT5H")
-    query_period                = optional(string, "PT5H")
+    suppression_enabled         = optional(bool)   # Default: false
+    suppression_duration        = optional(string) # Default: "PT5H"
+    query_period                = optional(string) # Default: "PT5H"
     description                 = optional(string)
-    enabled                     = optional(bool, true)
-    trigger_operator            = optional(string, "GreaterThan")
+    enabled                     = optional(bool)   # Default: true
+    trigger_operator            = optional(string) # Default: "GreaterThan"
     custom_details              = optional(map(string))
     alert_rule_template_version = optional(string)
     alert_rule_template_guid    = optional(string)
-    query_frequency             = optional(string, "PT5H")
-    trigger_threshold           = optional(number, 0)
+    query_frequency             = optional(string) # Default: "PT5H"
+    trigger_threshold           = optional(number) # Default: 0
     alert_details_override = optional(object({
       description_format  = optional(string)
       display_name_format = optional(string)
@@ -95,10 +95,10 @@ EOT
         by_alert_details        = optional(list(string))
         by_custom_details       = optional(list(string))
         by_entities             = optional(list(string))
-        enabled                 = optional(bool, true)
-        entity_matching_method  = optional(string, "AnyAlert")
-        lookback_duration       = optional(string, "PT5M")
-        reopen_closed_incidents = optional(bool, false)
+        enabled                 = optional(bool)   # Default: true
+        entity_matching_method  = optional(string) # Default: "AnyAlert"
+        lookback_duration       = optional(string) # Default: "PT5M"
+        reopen_closed_incidents = optional(bool)   # Default: false
       })
     }))
     sentinel_entity_mapping = optional(list(object({
@@ -116,7 +116,7 @@ EOT
   validation {
     condition = alltrue([
       for k, v in var.sentinel_alert_rule_scheduleds : (
-        alltrue([for item in v.entity_mapping : (length(item.field_mapping) <= 3)])
+        v.entity_mapping == null || alltrue([for item in v.entity_mapping : (length(item.field_mapping) <= 3)])
       )
     ])
     error_message = "Each field_mapping list must contain at most 3 items"
