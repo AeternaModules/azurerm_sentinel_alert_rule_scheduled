@@ -1,3 +1,7 @@
+output "sentinel_alert_rule_scheduleds_id" {
+  description = "Map of id values across all sentinel_alert_rule_scheduleds, keyed the same as var.sentinel_alert_rule_scheduleds"
+  value       = { for k, v in azurerm_sentinel_alert_rule_scheduled.sentinel_alert_rule_scheduleds : k => v.id }
+}
 output "sentinel_alert_rule_scheduleds_alert_details_override" {
   description = "Map of alert_details_override values across all sentinel_alert_rule_scheduleds, keyed the same as var.sentinel_alert_rule_scheduleds"
   value       = { for k, v in azurerm_sentinel_alert_rule_scheduled.sentinel_alert_rule_scheduleds : k => v.alert_details_override }
