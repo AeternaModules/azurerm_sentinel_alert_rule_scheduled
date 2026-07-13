@@ -129,92 +129,142 @@ EOT
     ])
     error_message = "Each sentinel_entity_mapping list must contain at most 10 items"
   }
-  # --- Unconfirmed validation candidates, derived from azurerm_sentinel_alert_rule_scheduled's provider source ---
-  # Not auto-enabled: either a bespoke provider validator we can't safely translate,
-  # or a path that crosses a list-typed block (needs its own for_each wrapping).
-  # Review, translate into a real validation{} block above, and delete once confirmed.
-  # path: name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: log_analytics_workspace_id
-  #   source:    [from workspaces.ValidateWorkspaceID] !ok
-  # path: log_analytics_workspace_id
-  #   source:    [from workspaces.ValidateWorkspaceID] err != nil
-  # path: display_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: alert_rule_template_guid
-  #   condition: can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", value))
-  #   message:   must be a valid UUID
-  # path: description
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: event_grouping.aggregation_method
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: tactics[*]
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: techniques[*]
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: incident.grouping.lookback_duration
-  #   source:    [from validate.ISO8601Duration] !ok
-  # path: incident.grouping.lookback_duration
-  #   source:    [from validate.ISO8601Duration] err != nil
-  # path: incident.grouping.entity_matching_method
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: incident.grouping.by_entities[*]
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: incident.grouping.by_alert_details[*]
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: incident.grouping.by_custom_details[*]
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: severity
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: query
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: query_frequency
-  #   source:    validate.ISO8601DurationBetween: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
-  # path: query_period
-  #   source:    validate.ISO8601DurationBetween: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
-  # path: trigger_operator
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: trigger_threshold
-  #   condition: value >= 0
-  #   message:   must be at least 0
-  # path: suppression_duration
-  #   source:    validate.ISO8601DurationBetween: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
-  # path: alert_details_override.description_format
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: alert_details_override.display_name_format
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: alert_details_override.severity_column_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: alert_details_override.tactics_column_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: alert_details_override.dynamic_property.name
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: alert_details_override.dynamic_property.value
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: custom_details[*]
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: entity_mapping.entity_type
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: entity_mapping.field_mapping.identifier
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: entity_mapping.field_mapping.column_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: sentinel_entity_mapping.column_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        length(v.name) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        length(v.display_name) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.alert_rule_template_guid == null || (can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", v.alert_rule_template_guid)))
+      )
+    ])
+    error_message = "must be a valid UUID"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.description == null || (length(v.description) > 0)
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.techniques == null || (alltrue([for x in v.techniques : length(x) > 0]))
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.incident == null || (v.incident.grouping.by_custom_details == null || (alltrue([for x in v.incident.grouping.by_custom_details : length(x) > 0])))
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        length(v.query) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.trigger_threshold == null || (v.trigger_threshold >= 0)
+      )
+    ])
+    error_message = "must be at least 0"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.alert_details_override == null || alltrue([for item in v.alert_details_override : (item.description_format == null || (length(item.description_format) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.alert_details_override == null || alltrue([for item in v.alert_details_override : (item.display_name_format == null || (length(item.display_name_format) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.alert_details_override == null || alltrue([for item in v.alert_details_override : (item.severity_column_name == null || (length(item.severity_column_name) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.alert_details_override == null || alltrue([for item in v.alert_details_override : (item.tactics_column_name == null || (length(item.tactics_column_name) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.alert_details_override == null || alltrue([for item in v.alert_details_override : (item.dynamic_property == null || alltrue([for item in item.dynamic_property : (length(item.value) > 0)]))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.custom_details == null || (alltrue([for x in v.custom_details : length(x) > 0]))
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.entity_mapping == null || alltrue([for item in v.entity_mapping : (alltrue([for item in item.field_mapping : (length(item.identifier) > 0)]))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.entity_mapping == null || alltrue([for item in v.entity_mapping : (alltrue([for item in item.field_mapping : (length(item.column_name) > 0)]))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_alert_rule_scheduleds : (
+        v.sentinel_entity_mapping == null || alltrue([for item in v.sentinel_entity_mapping : (length(item.column_name) > 0)])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  # Note: 16 additional provider-side validators are enforced at apply time but not mirrored as validation{} blocks here (bespoke or non-mechanically-translatable).
 }
 
