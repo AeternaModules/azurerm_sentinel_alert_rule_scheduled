@@ -36,11 +36,11 @@ output "sentinel_alert_rule_scheduleds_entity_mapping" {
 }
 output "sentinel_alert_rule_scheduleds_event_grouping" {
   description = "Map of event_grouping values across all sentinel_alert_rule_scheduleds, keyed the same as var.sentinel_alert_rule_scheduleds"
-  value       = { for k, v in azurerm_sentinel_alert_rule_scheduled.sentinel_alert_rule_scheduleds : k => v.event_grouping if v.event_grouping != null && length(v.event_grouping) > 0 }
+  value       = { for k, v in azurerm_sentinel_alert_rule_scheduled.sentinel_alert_rule_scheduleds : k => one(v.event_grouping) if v.event_grouping != null && length(v.event_grouping) > 0 }
 }
 output "sentinel_alert_rule_scheduleds_incident" {
   description = "Map of incident values across all sentinel_alert_rule_scheduleds, keyed the same as var.sentinel_alert_rule_scheduleds"
-  value       = { for k, v in azurerm_sentinel_alert_rule_scheduled.sentinel_alert_rule_scheduleds : k => v.incident if v.incident != null && length(v.incident) > 0 }
+  value       = { for k, v in azurerm_sentinel_alert_rule_scheduled.sentinel_alert_rule_scheduleds : k => one(v.incident) if v.incident != null && length(v.incident) > 0 }
 }
 output "sentinel_alert_rule_scheduleds_log_analytics_workspace_id" {
   description = "Map of log_analytics_workspace_id values across all sentinel_alert_rule_scheduleds, keyed the same as var.sentinel_alert_rule_scheduleds"
